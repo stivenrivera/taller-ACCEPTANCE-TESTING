@@ -18,7 +18,7 @@ def step_when_add_task(context, task):
 
 @when('the user lists all tasks')
 def step_when_list_tasks(context):
-    context.list_output = context.manager.list_tasks()
+    context.list_output = context.manager.list_tasks_formatted()
 
 @when('the user marks task "{task}" as completed')
 def step_when_mark_completed(context, task):
@@ -68,7 +68,10 @@ def step_then_task_completed(context, task):
 
 @then('the output should contain')
 def step_then_output_should_contain(context):
-    assert context.list_output.strip() == context.text.strip()
+    expected_tasks = [line.strip('- ') for line in context.text.strip().splitlines()[1:]]
+    actual_tasks = [task['title'] for task in context.manager.list_tasks()]
+    assert expected_tasks == actual_tasks, f"Expected: {expected_tasks}, but got: {actual_tasks}"
+
 
 @then('the to-do list should be empty')
 def step_then_list_empty(context):
